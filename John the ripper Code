@@ -1,0 +1,45 @@
+git clone https://github.com/yourusername/your-repository.git
+cd your-repository
+
+tar -xvf john-<version>.tar.gz
+cd john-<version>/src
+./configure && make
+
+cp ../run/john ../../your-repository/
+cd ../../your-repository
+
+
+git add john
+git commit -m "Add John the Ripper"
+git push origin main
+
+name: John the Ripper CI
+
+on: [push, pull_request]
+
+jobs:
+  run-john-the-ripper:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up John the Ripper
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y john
+
+    - name: Run John the Ripper
+      run: |
+        echo "SampleHash: $1$EgH9QWf3$2n6RmS.rqKH5oGfgvVLxG/" > hashes.txt
+        john hashes.txt
+        john --show hashes.txt
+
+git add .github/workflows/john-the-ripper.yml
+git commit -m "Add John the Ripper CI workflow"
+git push origin main
+
+./john hashes.txt
+./john --show hashes.txt
+
